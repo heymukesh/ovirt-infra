@@ -1,0 +1,118 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+
+   - name: stop & disable firewall
+     systemd:
+       name: firewalld
+       enabled: no
+       state: stopped
+
+   - name: disable SELinux
+     shell: setenforce 0
+
+   - name: disable SELinux on reboot
+     selinux:
+       state: disabled
+
+
+   - name: Disable IPv6 with sysctl
+     sysctl: name={{ item }} value=1 state=present
+     with_items:
+       - net.ipv6.conf.all.disable_ipv6
+       - net.ipv6.conf.default.disable_ipv6
+       - net.ipv6.conf.lo.disable_ipv6
+
+   - name: RedHat | disable ipv6 in sysconfig/network
+     blockinfile:
+       path: /etc/sysconfig/network
+       block: |
+         NETWORKING_IPV6=NO
+     notify:
+       - restart network
+     when: ansible_os_family == 'CentOS'
+
+   - name: generate ssh keys
+     shell: ssh-keygen -b 2048 -t rsa -f /root/.ssh/id_rsa -q -N ""
+     args:
+       creates: /root/.ssh/id_rsa
+
+   - name: Install Java
+     dnf:
+       name: java
+       state: latest
+
+   - name: Install Java-Devel
+     dnf:
+       name: java-devel
+       state: latest
+
+
+- hosts: slave
+  become: yes
+  tasks:
+   - name: install maven
+     dnf:
+       name: maven
+       state: latest
+
+   - name: install maven
+     dnf:
+       name: git
+       state: latest
+
+   - name: add self authorization key
+     shell: cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+
+- hosts: jenkins
+  become: yes
+  tasks:
+   - name: Add Jenkins Repository
+     get_url:
+       url: https://pkg.jenkins.io/redhat/jenkins.repo
+       dest: /etc/yum.repos.d/
+
+   - name: Import Jenkins Repo Keys
+     rpm_key:
+       key: https://pkg.jenkins.io/redhat/jenkins.io.key
+       state: present
+
+   - name: Install Jenkins
+     dnf:
+       name: jenkins
+       state: latest
+
+   - name: enable jenkins service is started and enabled
+     systemd:
+       name: jenkins
+       enabled: yes
+       state: started
+
+   - name: Create Directory known_hosts for slave nodes
+     file: 
+       path: /var/lib/jenkins/.ssh
+       state: directory 
+
+   - name: Scan Slave ssh key  
+     shell:  ssh-keyscan -H 10.80.41.217 >> /var/lib/jenkins/.ssh/known_hosts
+
+
+- hosts: docker 
+  become: yes
+  tasks:
+
+   - name: Add Docker Repository
+     get_url:
+       url: https://download.docker.com/linux/centos/docker-ce.repo
+       dest: /etc/yum.repos.d/
+
+   - name: Install Docker-ce
+     shell: dnf install --nobest docker-ce -y
+
+   - name: enable docker service is started and enabled
+     systemd:
+       name: docker
+       enabled: yes
+       state: started
+

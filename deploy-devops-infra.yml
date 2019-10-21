@@ -1,0 +1,64 @@
+---
+- name: Create New VM on RHV
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars_files:
+    - rhv_vars.yml
+    - password.yml
+
+  pre_tasks:
+  - name: Login to oVirt
+    ovirt_auth:
+      hostname: "{{ rhvm_fqdn }}"
+      username: "{{ rhvm_user }}"
+      password: "{{ rhvm_password }}"
+      ca_file: "{{ rhvm_cafile | default(omit) }}"
+      insecure: "{{rhvm_insecure | default(true) }}"
+    tags:
+      - always
+
+  vars:
+    datacenter: Flexera_BLR
+    cluster: Flexera_BLR_Hosts
+    template: CentOS80
+
+  tasks:
+  - name: "Create and run VM from template"
+    ovirt_vm:
+      auth: "{{ ovirt_auth }}"
+      name: "fnms.{{ item.key }}"
+      template: "{{ template }}"
+      cluster: "{{ cluster }}"
+      memory: "{{ item.value.mem }}"
+      memory_guaranteed: "{{ item.value.mem }}"
+      comment: Provisioned by Ansible
+      high_availability: 0 
+      operating_system: rhel_8x64
+      cloud_init:
+        nic_boot_protocol: static
+        nic_ip_address: "10.80.41.21{{ item.value.id }}"
+        nic_netmask: 255.255.254.0
+        nic_gateway: 10.80.40.1
+        nic_name: ens3
+        nic_on_boot: true
+        dns_search: flexera.com
+        dns_servers: 10.80.101.254
+        host_name: "{{ item.key }}"
+        user_name: root
+        root_password: root123
+        authorized_ssh_keys: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCpC2UR+OL+ZIlue+0bjCa4Yejdi4nNU6cx5GlaR9d2TTspm6R6798VcPt+RELuONFZrmQvVzOHjisOev34ebVbhPzZI2sK2/6QJTd8FoSitZYVemgfaAkNxk9FWYnKL8E0D0UfSEeHQpgxChC3FC+sHOb2dFsTAc991rdCUwedvDYvn9D86mR2xhdYnuNJEqN/Zk5nXJFL7raRgZDG0dx2Sum0rAi1NXaYV/kOTyn8rG4VciyDa5rbFqtoPTcIePG5YAzszIkPtiMNNNMyj3nZrmi7xOpYhCyDSB03tovghU0zE0+deZ2fxxQ9X+l4sRaXRUHTk+daOJOqeaFOs+Qd root@ovirt-engine
+        regenerate_ssh_keys: True
+        timezone: Asia/Kolkata
+      wait: yes
+      state: running
+    with_dict: "{{ vms }}"
+
+  post_tasks:
+  - name: Logout from oVirt
+    ovirt_auth:
+      state: absent
+      ovirt_auth: "{{ ovirt_auth }}"
+    tags:
+      - always

@@ -1,0 +1,33 @@
+---
+- name: Remove VM on RHV
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars_files:
+    - rhv_vars.yml
+    - password.yml
+
+  pre_tasks:
+  - name: Login to oVirt
+    ovirt_auth:
+      hostname: "{{ rhvm_fqdn }}"
+      username: "{{ rhvm_user }}"
+      password: "{{ rhvm_password }}"
+      ca_file: "{{ rhvm_cafile | default(omit) }}"
+      insecure: "{{rhvm_insecure | default(true) }}"
+    tags:
+      - always
+
+  vars:
+    datacenter: Flexera_BLR
+    cluster: Flexera_BLR_Hosts
+    template: CentOS80
+
+  tasks:
+  - name: Remove VM 
+    ovirt_vm:
+      auth: "{{ ovirt_auth }}"
+      state: absent
+      name: "fnms.{{ item.key }}"
+    with_dict: "{{ vms }}"
