@@ -36,7 +36,7 @@
       comment: Provisioned by Ansible
       high_availability: 0 
       operating_system: rhel_8x64
-      cloud_init:
+      cloud_init_nics:
         nic_boot_protocol: static
         nic_ip_address: "10.80.41.21{{ item.value.id }}"
         nic_netmask: 255.255.254.0
