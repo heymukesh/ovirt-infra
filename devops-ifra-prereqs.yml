@@ -62,7 +62,7 @@
 
    - name: Import EPEL Rpository key
      rpm_key:
-       name: https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}
+       key: https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}
        state: present
 
    - name: Install Java
