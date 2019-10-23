@@ -3,12 +3,6 @@
   become: yes
   tasks:
 
-   - name: stop & disable firewall
-     systemd:
-       name: firewalld
-       enabled: no
-       state: stopped
-
    - name: disable SELinux
      shell: setenforce 0
 
@@ -79,7 +73,7 @@
        state: present
 
    - name: Install Jenkins
-     dnf:
+     yum:
        name: jenkins
        state: latest
 
@@ -108,7 +102,9 @@
        dest: /etc/yum.repos.d/
 
    - name: Install Docker-ce
-     shell: dnf install docker-ce -y
+     yum:
+       name: docker-ce
+       state: latest
 
    - name: enable docker service is started and enabled
      systemd:
