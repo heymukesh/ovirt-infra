@@ -177,4 +177,124 @@
        enabled: yes
        state: started
 
+- hosts: k8s-master, k8s-node-1, k8s-node-2
+  become: yes
+  tasks:
+     
+   - name: Remove swapfile from /etc/fstab
+     mount:
+       name: swap
+       fstype: swap
+       state: absent
+
+   - name: Disable swap
+     command: swapoff -a
+     when: ansible_swaptotal_mb > 0
+
+   - name: load the kernel module
+     modprobe:
+       name: br_netfilter
+       state: present
+
+   - name: ensure net.bridge.bridge-nf-call-ip6tables is set to 1
+     sysctl:
+       name: net.bridge.bridge-nf-call-ip6tables
+       value: '1'
+       state: present
+
+   - name: ensure net.bridge.bridge-nf-call-iptables is set to 1
+     sysctl:
+       name: net.bridge.bridge-nf-call-iptables
+       value: '1'
+       state: present
+   
+   - name: add Kubernetes dnf repository
+     yum_repository:
+       name: Kubernetes
+       description: Kubernetes dnf repository
+       baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+       gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+       gpgcheck: yes
+
+   - name: install kubelet
+     dnf:
+        name: kubelet
+        state: present
+        update_cache: true
+
+   - name: install kubeadm
+     dnf:
+        name: kubeadm
+        state: present
+
+   - name: start kubelet
+     service:
+       name: kubelet
+       enabled: yes
+       state: started
+
+- hosts: k8s-master
+  become: yes
+  tasks:
+    - name: initialize the cluster using script
+      #script: /etc/ansible/kube.sh
+      #- name: initialize the cluster
+      shell: kubeadm init --pod-network-cidr=10.244.0.0/16 >> cluster_initialized.txt #--skip-preflight-checks=true --apiserver-advertise-address=10.80.151.199 --pod-network-cidr=10.244.0.0/16 >> cluster_initialized.txt
+      args:
+        chdir: /root
+        creates: cluster_initialized.txt
+
+      #command: kubeadm init --apiserver-advertise-address="192.168.50.10" --apiserver-cert-extra-sans="192.168.50.10"  --node-name k8s-master --pod-network-cidr=192.168.0.0/16 >> cluster_initialized.txt
+      #
+      #
+    - name: create .kube directory
+      become: yes
+      become_user: root
+      file:
+        path: $HOME/.kube
+        state: directory
+        mode: 0755
+
+    - name: copy admin.conf to user's kube config
+      copy:
+        src: /etc/kubernetes/admin.conf
+        dest: /root/.kube/config
+        remote_src: yes
+        owner: root
+
+    - name: install kube-flannel
+      become: yes
+      become_user: root
+      shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.9.1/Documentation/kube-flannel.yml >> pod_network_setup.txt
+      #shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/a70459be0084506e4ec919aa1c114638878db11b/Documentation/kube-flannel.yml >> pod_network_setup.txt
+      args:
+        chdir: $HOME
+        creates: pod_network_setup.txt
+
+    - name: install kube-flannel-rbac
+      become: yes
+      become_user: root
+      shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/k8s-manifests/kube-flannel-rbac.yml >> rbac_setup.txt
+      #shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/a70459be0084506e4ec919aa1c114638878db11b/Documentation/kube-flannel.yml >> pod_network_setup.txt
+      args:
+        chdir: $HOME
+        creates: rbac_setup.txt
+
+    - name: get join command
+      shell: kubeadm token create --print-join-command
+      register: join_command_raw
+
+    - name: set join command
+      set_fact:
+        join_command: "{{ join_command_raw.stdout_lines[0] }}"
+
+
+- hosts: k8s-node-1, k8s-node-2
+  remote_user: root
+  tasks:
+    - name: join cluster
+      shell: "{{ hostvars['k8s-master'].join_command }}" # --ignore-preflight-errors all  >> node_joined.txt"
+      args:
+        chdir: $HOME
+        creates: node_joined.txt
 
