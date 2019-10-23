@@ -174,7 +174,7 @@
      unarchive:
         src: /tmp/tomcat7.tar
         dest: /opt/
-        remote_src: yes
+        
    
    - name: Start Tomcat Service
      shell: /opt/tomcat7/bin/startup.sh
