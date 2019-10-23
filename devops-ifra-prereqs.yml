@@ -32,11 +32,12 @@
      args:
        creates: /root/.ssh/id_rsa
 
-   - name: Install Java
-     yum:
+   - name: Enable EPEL Rpository
+     yum_repository:
        name: epel
-       state: latest
-
+       description: EPEL YUM repo
+       baseurl: https://download.fedoraproject.org/pub/epel/$releasever/$basearch/
+       
    - name: Install Java
      yum:
        name: java
