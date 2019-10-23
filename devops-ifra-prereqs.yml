@@ -299,3 +299,12 @@
         chdir: $HOME
         creates: node_joined.txt
 
+- hosts: k8s-master
+  become: yes
+  tasks:
+    - name: display worker nodes
+      shell: kubectl label node {{item}} node-role.kubernetes.io/worker=worker
+      with_items:
+        - k8s-node-1
+        - k8s-node-2
+
