@@ -31,22 +31,6 @@
      shell: ssh-keygen -b 2048 -t rsa -f /root/.ssh/id_rsa -q -N ""
      args:
        creates: /root/.ssh/id_rsa
-
-   - name: Enable EPEL Rpository
-     yum_repository:
-       name: epel
-       description: EPEL YUM repo
-       baseurl: https://download.fedoraproject.org/pub/epel/$releasever/$basearch/
-       
-   - name: Install Java
-     yum:
-       name: java
-       state: latest
-
-   - name: Install Java-Devel
-     yum:
-       name: java-devel
-       state: latest
    - name: Upgrade the Machine
      yum:
        name: '*'
@@ -69,6 +53,24 @@
    - name: Wait for thing to reboot...
      pause: seconds=45
      when: rebooting|changed
+     
+   - name: Enable EPEL Rpository
+     yum_repository:
+       name: epel
+       description: EPEL YUM repo
+       baseurl: https://download.fedoraproject.org/pub/epel/$releasever/$basearch/
+
+   - name: Install Java
+     yum:
+       name: java
+       state: latest
+
+   - name: Install Java-Devel
+     yum:
+       name: java-devel
+       state: latest
+   
+
 
 - hosts: slave
   become: yes
@@ -153,3 +155,20 @@
        name: docker
        enabled: yes
        state: started
+
+- hosts: tomcat 
+  become: yes
+  tasks:
+
+   - name: Download Tomcat
+     get_url: 
+        url: http://10.80.40.21/shared/tomcat/tomcat7.tar
+        dest: /opt
+
+   - name: Extract the Tomcat
+     unarchive:
+        src: /opt/tomcat7.tar
+        dest: /opt/tomcat7
+   
+   - name: Start Tomcat Service
+     shell: /opt/tomcat7/bin/startup.sh
