@@ -3,35 +3,35 @@ rhvm_fqdn: ovirt-engine
 rhvm_user: admin@internal
 vms:
   jenkins-master:
-    id: 6
+    id: 16
     cpu: 1
     mem: 1024000
+    
   jenkins-slave-0:
-    id: 7
+    id: 17
     cpu: 1
     mem: 1024000
+    
+  tomcat:
+    id: 23
+    cpu: 1
+    mem: 1024000
+    
   docker:
-    id: 8
+    id: 18
     cpu: 1
     mem: 1024000
-#  nexus:
-#    id: 13
-#    cpu: 1
-#    mem: 1024
-#  sonarqube:
-#    id: 14
-#    cpu: 1
-#    mem: 1024
-#  k8s-master:
-#    id: 15
-#    cpu: 2
-#    mem: 2048
-#  k8s-node-1:
-#    id: 16
-#    cpu: 2
-#    mem: 2048
-#  k8s-node-2:
-#    id: 17
-#    cpu: 2
-#    mem: 2048
+
+  k8s-master:
+    id: 25
+    cpu: 2
+    mem: 2048000
+  k8s-node-1:
+    id: 30
+    cpu: 2
+    mem: 2048000
+  k8s-node-2:
+    id: 32
+    cpu: 2
+    mem: 2048000
 
