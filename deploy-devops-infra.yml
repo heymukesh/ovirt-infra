@@ -41,7 +41,7 @@
         nic_ip_address: "10.80.41.21{{ item.value.id }}"
         nic_netmask: 255.255.254.0
         nic_gateway: 10.80.40.1
-        nic_name: ens3
+        nic_name: eth0
         nic_on_boot: true
         dns_search: flexera.com
         dns_servers: 10.80.101.254
