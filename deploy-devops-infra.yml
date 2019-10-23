@@ -22,7 +22,7 @@
   vars:
     datacenter: Flexera_BLR
     cluster: Flexera_BLR_Hosts
-    template: CentOS80
+    template: CentOS7
 
   tasks:
   - name: "Create and run VM from template"
