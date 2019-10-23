@@ -173,7 +173,7 @@
    - name: Extract the Tomcat
      unarchive:
         src: /opt/tomcat7.tar
-        dest: /opt/tomcat7
+        dest: /opt/
    
    - name: Start Tomcat Service
      shell: /opt/tomcat7/bin/startup.sh
