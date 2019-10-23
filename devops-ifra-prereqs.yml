@@ -55,10 +55,9 @@
      when: rebooting|changed
      
    - name: Enable EPEL Rpository
-     yum_repository:
-       name: epel
-       description: EPEL YUM repo
-       baseurl: https://download.fedoraproject.org/pub/epel/$releasever/$basearch/
+     yum:
+       name: epel-release
+       state: latest
 
    - name: Install Java
      yum:
