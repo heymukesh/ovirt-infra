@@ -217,13 +217,13 @@
        gpgcheck: yes
 
    - name: install kubelet
-     dnf:
+     yum:
         name: kubelet
         state: present
         update_cache: true
 
    - name: install kubeadm
-     dnf:
+     yum:
         name: kubeadm
         state: present
 
@@ -249,7 +249,7 @@
       #
     - name: create .kube directory
       become: yes
-      become_user: root
+      #become_user: root
       file:
         path: $HOME/.kube
         state: directory
@@ -264,7 +264,7 @@
 
     - name: install kube-flannel
       become: yes
-      become_user: root
+      #become_user: root
       shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.9.1/Documentation/kube-flannel.yml >> pod_network_setup.txt
       #shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/a70459be0084506e4ec919aa1c114638878db11b/Documentation/kube-flannel.yml >> pod_network_setup.txt
       args:
@@ -273,7 +273,7 @@
 
     - name: install kube-flannel-rbac
       become: yes
-      become_user: root
+      #become_user: root
       shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/k8s-manifests/kube-flannel-rbac.yml >> rbac_setup.txt
       #shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/a70459be0084506e4ec919aa1c114638878db11b/Documentation/kube-flannel.yml >> pod_network_setup.txt
       args:
@@ -290,7 +290,8 @@
 
 
 - hosts: k8s-node-1, k8s-node-2
-  remote_user: root
+  become: yes
+  #remote_user: root
   tasks:
     - name: join cluster
       shell: "{{ hostvars['k8s-master'].join_command }}" # --ignore-preflight-errors all  >> node_joined.txt"
