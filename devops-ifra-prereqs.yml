@@ -108,7 +108,7 @@
        dest: /etc/yum.repos.d/
 
    - name: Install Docker-ce
-     shell: dnf install --nobest docker-ce -y
+     shell: dnf install docker-ce -y
 
    - name: enable docker service is started and enabled
      systemd:
