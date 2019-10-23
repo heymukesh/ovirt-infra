@@ -55,9 +55,10 @@
      when: rebooting|changed
      
    - name: Enable EPEL Rpository
-     yum:
-       name: epel-release
-       state: latest
+     shell: yum install epel-release -y
+     #yum:
+       #name: epel-release
+       #state: latest
 
    - name: Install Java
      yum:
