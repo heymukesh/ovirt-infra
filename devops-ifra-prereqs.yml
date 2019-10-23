@@ -80,14 +80,13 @@
 - hosts: jenkins-slave-0
   become: yes
   tasks:
-   - name: install maven
-     yum:
-       name: maven
-       state: latest
 
-   - name: install maven
+   - name: install maven, git, ansible
      yum:
-       name: git
+       name: 
+         - maven
+         - git
+         - ansible
        state: latest
 
    - name: add self authorization key
