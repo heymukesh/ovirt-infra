@@ -6,7 +6,7 @@
 
   vars_files:
     - devops-infra-vars.yml
-    - password.yml
+    - ovir-engine-password.yml
 
   pre_tasks:
   - name: Login to oVirt
