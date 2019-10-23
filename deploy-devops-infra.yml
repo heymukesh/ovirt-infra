@@ -5,7 +5,7 @@
   gather_facts: false
 
   vars_files:
-    - rhv_vars.yml
+    - devops-infra-vars.yml
     - password.yml
 
   pre_tasks:
