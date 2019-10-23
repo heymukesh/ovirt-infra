@@ -55,10 +55,15 @@
      when: rebooting|changed
      
    - name: Enable EPEL Rpository
-     shell: yum install epel-release -y
-     #yum:
-       #name: epel-release
-       #state: latest
+     #shell: yum install epel-release -y
+     yum:
+       name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
+       state: present
+
+   - name: Import EPEL Rpository key
+       rpm_key:
+       name: https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}
+       state: present
 
    - name: Install Java
      yum:
