@@ -12,26 +12,33 @@ vms:
     cpu: 1
     mem: 1024000
     
+  ansible:
+    id: 18
+    cpu: 1
+    mem: 1024000
+    
   tomcat:
     id: 23
     cpu: 1
     mem: 1024000
     
   docker:
-    id: 18
+    id: 25
     cpu: 1
     mem: 1024000
 
   k8s-master:
-    id: 25
-    cpu: 2
-    mem: 2048000
-  k8s-node-1:
     id: 30
     cpu: 2
     mem: 2048000
-  k8s-node-2:
+  
+  k8s-node-1:
     id: 32
+    cpu: 2
+    mem: 2048000
+  
+  k8s-node-2:
+    id: 47
     cpu: 2
     mem: 2048000
 
