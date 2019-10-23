@@ -124,8 +124,25 @@
    - name: Scan Slave ssh key  
      shell:  ssh-keyscan -H 10.80.41.217 >> /var/lib/jenkins/.ssh/known_hosts
 
+- hosts: tomcat 
+  become: yes
+  tasks:
 
-- hosts: docker 
+   - name: Download Tomcat
+     get_url: 
+        url: http://10.80.40.21/shared/tomcat/tomcat9.tar
+        dest: /tmp
+
+   - name: Extract the Tomcat
+     unarchive:
+        src: /tmp/tomcat9.tar
+        dest: /opt
+        remote_src: yes
+   
+   - name: Start Tomcat Service
+     shell: /opt/opt/tomcat9/bin/startup.sh
+     
+- hosts: docker, k8s-master, k8s-node-1, k8s-node-2
   become: yes
   tasks:
 
@@ -160,20 +177,4 @@
        enabled: yes
        state: started
 
-- hosts: tomcat 
-  become: yes
-  tasks:
 
-   - name: Download Tomcat
-     get_url: 
-        url: http://10.80.40.21/shared/tomcat/tomcat9.tar
-        dest: /tmp
-
-   - name: Extract the Tomcat
-     unarchive:
-        src: /tmp/tomcat9.tar
-        dest: /opt
-        remote_src: yes
-   
-   - name: Start Tomcat Service
-     shell: /opt/opt/tomcat9/bin/startup.sh
