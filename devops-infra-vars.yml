@@ -6,14 +6,14 @@ vms:
     id: 6
     cpu: 1
     mem: 1024000
-  #jenkins-slave-0:
-    #id: 7
-    #cpu: 1
-    #mem: 1024000
-  #docker:
-    #id: 8
-    #cpu: 1
-    #mem: 1024000
+  jenkins-slave-0:
+    id: 7
+    cpu: 1
+    mem: 1024000
+  docker:
+    id: 8
+    cpu: 1
+    mem: 1024000
 #  nexus:
 #    id: 13
 #    cpu: 1
