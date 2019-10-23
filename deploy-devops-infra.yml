@@ -38,7 +38,7 @@
       operating_system: rhel_7x64
       cloud_init:
         nic_boot_protocol: static
-        nic_ip_address: "10.80.41.21{{ item.value.id }}"
+        nic_ip_address: "10.80.41.2{{ item.value.id }}"
         nic_netmask: 255.255.254.0
         nic_gateway: 10.80.40.1
         nic_name: eth0
