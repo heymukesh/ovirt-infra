@@ -33,12 +33,12 @@
        creates: /root/.ssh/id_rsa
 
    - name: Install Java
-     dnf:
+     yum:
        name: java
        state: latest
 
    - name: Install Java-Devel
-     dnf:
+     yum:
        name: java-devel
        state: latest
 
@@ -47,12 +47,12 @@
   become: yes
   tasks:
    - name: install maven
-     dnf:
+     yum:
        name: maven
        state: latest
 
    - name: install maven
-     dnf:
+     yum:
        name: git
        state: latest
 
