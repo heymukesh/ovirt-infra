@@ -167,14 +167,14 @@
 
    - name: Download Tomcat
      get_url: 
-        url: http://10.80.40.21/shared/tomcat/tomcat7.tar
+        url: http://10.80.40.21/shared/tomcat/tomcat9.tar
         dest: /tmp
 
    - name: Extract the Tomcat
      unarchive:
-        src: /tmp/tomcat7.tar
+        src: /tmp/tomcat9.tar
         dest: /opt
         remote_src: yes
    
    - name: Start Tomcat Service
-     shell: /opt/tomcat7/bin/startup.sh
+     shell: /opt/opt/tomcat9/bin/startup.sh
