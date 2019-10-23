@@ -77,7 +77,7 @@
    
 
 
-- hosts: slave
+- hosts: jenkins-slave-0
   become: yes
   tasks:
    - name: install maven
@@ -93,7 +93,7 @@
    - name: add self authorization key
      shell: cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 
-- hosts: jenkins
+- hosts: jekins-master
   become: yes
   tasks:
    - name: Add Jenkins Repository
