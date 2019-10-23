@@ -38,7 +38,7 @@
       operating_system: rhel_7x64
       nics:
         - name: nic1
-          network: ovirtmgmt
+          #network: ovirtmgmt
           profile: ovirtmgmt
       cloud_init:
         nic_boot_protocol: static
