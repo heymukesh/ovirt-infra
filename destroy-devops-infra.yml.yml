@@ -5,8 +5,8 @@
   gather_facts: false
 
   vars_files:
-    - rhv_vars.yml
-    - password.yml
+    - devops-infra-vars.yml
+    - ../../ovir-engine-password.yml
 
   pre_tasks:
   - name: Login to oVirt
