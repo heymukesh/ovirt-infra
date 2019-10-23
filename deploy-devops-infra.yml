@@ -36,7 +36,7 @@
       comment: Provisioned by Ansible
       high_availability: 0 
       operating_system: rhel_7x64
-      nics:
+      #nics:
         #- name: nic1
           #network: ovirtmgmt
           #profile: ovirtmgmt
