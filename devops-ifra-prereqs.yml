@@ -173,7 +173,6 @@
    - name: Extract the Tomcat
      unarchive:
         src: /opt/tomcat7.tar
-        dest: /opt/
         remote_src: yes
    
    - name: Start Tomcat Service
