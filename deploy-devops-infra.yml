@@ -36,10 +36,6 @@
       comment: Provisioned by Ansible
       high_availability: 0 
       operating_system: rhel_7x64
-      #nics:
-        #- name: nic1
-          #network: ovirtmgmt
-          #profile: ovirtmgmt
       cloud_init:
         nic_boot_protocol: static
         nic_ip_address: "10.80.41.21{{ item.value.id }}"
