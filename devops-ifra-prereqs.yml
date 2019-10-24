@@ -2,7 +2,15 @@
 - hosts: all
   become: yes
   tasks:
-   
+
+   - name: add flexera user
+     user:
+       name: flexera
+       password: flexera
+       
+         
+     shell: setenforce 0
+     
    - name: disable SELinux
      shell: setenforce 0
 
@@ -124,7 +132,7 @@
    - name: Scan Slave ssh key  
      shell:  ssh-keyscan -H 10.80.41.217 >> /var/lib/jenkins/.ssh/known_hosts
 
-- hosts: tomcat 
+- hosts: docker 
   become: yes
   tasks:
 
@@ -158,9 +166,9 @@
          - device-mapper-persistent-data
          - lvm2
          - python-pip
-         - docker
-         #- 3:docker-ce-18.09.0-3.el7.x86_64
-         #- 3:docker-ce-cli-18.09.0-3.el7.x86_64
+         #- docker
+         - 3:docker-ce-18.09.0-3.el7.x86_64
+         - 3:docker-ce-cli-18.09.0-3.el7.x86_64
        state: present
    
    - name: adding root user to group docker
@@ -221,14 +229,14 @@
 
    - name: install kubelet
      yum:
-        name: kubelet-1.14.0
-        state: present
+        name: kubelet
+        state: latest
         update_cache: true
 
    - name: install kubeadm
      yum:
-        name: kubeadm-1.14.0
-        state: present
+        name: kubeadm
+        state: latest
 
    - name: start kubelet
      service:
