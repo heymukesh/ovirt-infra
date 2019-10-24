@@ -153,10 +153,18 @@
   become: yes
   tasks:
 
-   - name: Add Docker Repository
-     get_url:
-       url: https://download.docker.com/linux/centos/docker-ce.repo
-       dest: /etc/yum.repos.d/
+   - name: add Kubernetes dnf repository
+     yum_repository:
+       name: Kubernetes
+       description: Kubernetes dnf repository
+       baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+       gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+       gpgcheck: yes
+
+#   - name: Add Docker Repository
+#     get_url:
+#       url: https://download.docker.com/linux/centos/docker-ce.repo
+#       dest: /etc/yum.repos.d/
 
    - name: Install Docker
      yum:
@@ -165,9 +173,9 @@
          - device-mapper-persistent-data
          - lvm2
          - python-pip
-         #- docker
-         - 3:docker-ce-18.09.0-3.el7.x86_64
-         - 1:docker-ce-cli-18.09.0-3.el7.x86_64
+         - docker
+#         - 3:docker-ce-18.09.0-3.el7.x86_64
+#         - 1:docker-ce-cli-18.09.0-3.el7.x86_64
        state: present
    
    - name: adding root user to group docker
@@ -218,19 +226,9 @@
        value: '1'
        state: present
    
-   - name: add Kubernetes dnf repository
-     yum_repository:
-       name: Kubernetes
-       description: Kubernetes dnf repository
-       baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
-       gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
-       gpgcheck: yes
 
-   - name: install kubelet
-     yum:
-        name: kubelet
-        state: latest
-        update_cache: true
+
+
 
    - name: install kubeadm
      yum:
@@ -243,34 +241,52 @@
        enabled: yes
        state: started
 
-#- hosts: k8s-master
-#  become: yes
-#  tasks:
-#    - name: initialize the cluster using script
-#      #script: /etc/ansible/kube.sh
-#      #- name: initialize the cluster
-#      shell: kubeadm init --pod-network-cidr=10.244.0.0/16 >> cluster_initialized.txt #--skip-preflight-checks=true --apiserver-advertise-address=10.80.151.199 --pod-network-cidr=10.244.0.0/16 >> cluster_initialized.txt
-#      args:
-#        chdir: /root
-#        creates: cluster_initialized.txt
+- hosts: k8s-master
+  become: yes
+  tasks:
+    - name: initialize the cluster using script
+      #script: /etc/ansible/kube.sh
+      #- name: initialize the cluster
+      shell: kubeadm init --pod-network-cidr=10.244.0.0/16 >> cluster_initialized.txt #--skip-preflight-checks=true --apiserver-advertise-address=10.80.151.199 --pod-network-cidr=10.244.0.0/16 >> cluster_initialized.txt
+      args:
+        chdir: /root
+        creates: cluster_initialized.txt
 
       #command: kubeadm init --apiserver-advertise-address="192.168.50.10" --apiserver-cert-extra-sans="192.168.50.10"  --node-name k8s-master --pod-network-cidr=192.168.0.0/16 >> cluster_initialized.txt
       #
       #
-#    - name: create .kube directory
-#      become: yes
-#      #become_user: root
-#      file:
-#        path: $HOME/.kube
-#        state: directory
-#        mode: 0755
+    - name: create .kube directory
+      become: yes
+      #become_user: root
+      file:
+        path: $HOME/.kube
+        state: directory
+        mode: 0755
 
-#    - name: copy admin.conf to user's kube config
-#      copy:
-#        src: /etc/kubernetes/admin.conf
-#        dest: /root/.kube/config
-#        remote_src: yes
-#        owner: root
+    - name: copy admin.conf to user's kube config
+      copy:
+        src: /etc/kubernetes/admin.conf
+        dest: /root/.kube/config
+        remote_src: yes
+        owner: root
+        
+    - name: get kube-flannel
+      become: yes
+      #become_user: root
+      shell: export kubever=$(kubectl version | base64 | tr -d '\n') # >> pod_network_setup.txt
+      #shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/a70459be0084506e4ec919aa1c114638878db11b/Documentation/kube-flannel.yml >> pod_network_setup.txt
+#      args:
+#        chdir: $HOME
+#        creates: pod_network_setup.txt
+
+    - name: install kube-flannel
+      become: yes
+      #become_user: root
+      shell: kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$kubever" >> pod_network_setup.txt
+      #shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/a70459be0084506e4ec919aa1c114638878db11b/Documentation/kube-flannel.yml >> pod_network_setup.txt
+      args:
+        chdir: $HOME
+        creates: pod_network_setup.txt
 
 #    - name: install kube-flannel
 #      become: yes
@@ -290,31 +306,31 @@
 #        chdir: $HOME
 #        creates: rbac_setup.txt
 #
-#    - name: get join command
-#      shell: kubeadm token create --print-join-command
-#      register: join_command_raw
+    - name: get join command
+      shell: kubeadm token create --print-join-command
+      register: join_command_raw
 
-#    - name: set join command
-#      set_fact:
-#        join_command: "{{ join_command_raw.stdout_lines[0] }}"
+    - name: set join command
+      set_fact:
+        join_command: "{{ join_command_raw.stdout_lines[0] }}"
 
 
-#- hosts: k8s-node-1, k8s-node-2
-#  become: yes
-#  #remote_user: root
-#  tasks:
-#    - name: join cluster
-#      shell: "{{ hostvars['k8s-master'].join_command }}" # --ignore-preflight-errors all  >> node_joined.txt"
-#      args:
-#        chdir: $HOME
-#        creates: node_joined.txt
+- hosts: k8s-node-1, k8s-node-2
+  become: yes
+  #remote_user: root
+  tasks:
+    - name: join cluster
+      shell: "{{ hostvars['k8s-master'].join_command }}" # --ignore-preflight-errors all  >> node_joined.txt"
+      args:
+        chdir: $HOME
+        creates: node_joined.txt
 
-#- hosts: k8s-master
-#  become: yes
-#  tasks:
-#    - name: display worker nodes
-#      shell: kubectl label node {{item}} node-role.kubernetes.io/worker=worker
-#      with_items:
-#        - k8s-node-1
-#        - k8s-node-2
+- hosts: k8s-master
+  become: yes
+  tasks:
+    - name: display worker nodes
+      shell: kubectl label node {{item}} node-role.kubernetes.io/worker=worker
+      with_items:
+        - k8s-node-1
+        - k8s-node-2
 
