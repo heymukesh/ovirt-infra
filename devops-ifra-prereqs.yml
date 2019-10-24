@@ -178,11 +178,11 @@
 #         - 1:docker-ce-cli-18.09.0-3.el7.x86_64
        state: present
    
-   - name: adding root user to group docker
-     user:
-       name: root
-       groups: docker
-       append: yes
+#   - name: adding root user to group docker
+#     user:
+#       name: root
+#       groups: docker
+#       append: yes
 
    - name: upgrade pip
      pip:
