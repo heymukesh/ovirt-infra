@@ -7,9 +7,8 @@
      user:
        name: flexera
        password: flexera
-       
-         
-     shell: setenforce 0
+  
+ 
      
    - name: disable SELinux
      shell: setenforce 0
