@@ -11,12 +11,7 @@ vms:
     id: 17
     cpu: 1
     mem: 1024000
-
-  tomcat:
-    id: 18
-    cpu: 1
-    mem: 1024000
-    
+   
   docker:
     id: 25
     cpu: 1
