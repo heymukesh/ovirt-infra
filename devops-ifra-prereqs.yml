@@ -160,6 +160,7 @@
        baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
        gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
        gpgcheck: yes
+       enabled: 1
 
 #   - name: Add Docker Repository
 #     get_url:
@@ -273,7 +274,7 @@
     - name: get kube-flannel
       become: yes
       #become_user: root
-      shell: export kubever=$(kubectl version | base64 | tr -d '\n') # >> pod_network_setup.txt
+      shell: export kubever=$(kubectl version | base64 | tr -d '\n' > /tmp/kubever) # >> pod_network_setup.txt
       #shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/a70459be0084506e4ec919aa1c114638878db11b/Documentation/kube-flannel.yml >> pod_network_setup.txt
 #      args:
 #        chdir: $HOME
@@ -282,7 +283,7 @@
     - name: install kube-flannel
       become: yes
       #become_user: root
-      shell: kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$kubever" >> pod_network_setup.txt
+      shell: kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(cat /tmp/kubever)" >> pod_network_setup.txt
       #shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/a70459be0084506e4ec919aa1c114638878db11b/Documentation/kube-flannel.yml >> pod_network_setup.txt
       args:
         chdir: $HOME
