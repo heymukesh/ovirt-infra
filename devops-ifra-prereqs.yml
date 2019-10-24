@@ -167,7 +167,7 @@
          - python-pip
          #- docker
          - 3:docker-ce-18.09.0-3.el7.x86_64
-         - 3:docker-ce-cli-18.09.0-3.el7.x86_64
+         - 1:docker-ce-cli-18.09.0-3.el7.x86_64
        state: present
    
    - name: adding root user to group docker
@@ -243,43 +243,43 @@
        enabled: yes
        state: started
 
-- hosts: k8s-master
-  become: yes
-  tasks:
-    - name: initialize the cluster using script
-      #script: /etc/ansible/kube.sh
-      #- name: initialize the cluster
-      shell: kubeadm init --pod-network-cidr=10.244.0.0/16 >> cluster_initialized.txt #--skip-preflight-checks=true --apiserver-advertise-address=10.80.151.199 --pod-network-cidr=10.244.0.0/16 >> cluster_initialized.txt
-      args:
-        chdir: /root
-        creates: cluster_initialized.txt
+#- hosts: k8s-master
+#  become: yes
+#  tasks:
+#    - name: initialize the cluster using script
+#      #script: /etc/ansible/kube.sh
+#      #- name: initialize the cluster
+#      shell: kubeadm init --pod-network-cidr=10.244.0.0/16 >> cluster_initialized.txt #--skip-preflight-checks=true --apiserver-advertise-address=10.80.151.199 --pod-network-cidr=10.244.0.0/16 >> cluster_initialized.txt
+#      args:
+#        chdir: /root
+#        creates: cluster_initialized.txt
 
       #command: kubeadm init --apiserver-advertise-address="192.168.50.10" --apiserver-cert-extra-sans="192.168.50.10"  --node-name k8s-master --pod-network-cidr=192.168.0.0/16 >> cluster_initialized.txt
       #
       #
-    - name: create .kube directory
-      become: yes
-      #become_user: root
-      file:
-        path: $HOME/.kube
-        state: directory
-        mode: 0755
+#    - name: create .kube directory
+#      become: yes
+#      #become_user: root
+#      file:
+#        path: $HOME/.kube
+#        state: directory
+#        mode: 0755
 
-    - name: copy admin.conf to user's kube config
-      copy:
-        src: /etc/kubernetes/admin.conf
-        dest: /root/.kube/config
-        remote_src: yes
-        owner: root
+#    - name: copy admin.conf to user's kube config
+#      copy:
+#        src: /etc/kubernetes/admin.conf
+#        dest: /root/.kube/config
+#        remote_src: yes
+#        owner: root
 
-    - name: install kube-flannel
-      become: yes
-      #become_user: root
-      shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.9.1/Documentation/kube-flannel.yml >> pod_network_setup.txt
-      #shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/a70459be0084506e4ec919aa1c114638878db11b/Documentation/kube-flannel.yml >> pod_network_setup.txt
-      args:
-        chdir: $HOME
-        creates: pod_network_setup.txt
+#    - name: install kube-flannel
+#      become: yes
+#      #become_user: root
+#      shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.9.1/Documentation/kube-flannel.yml >> pod_network_setup.txt
+#      #shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/a70459be0084506e4ec919aa1c114638878db11b/Documentation/kube-flannel.yml >> pod_network_setup.txt
+#      args:
+#        chdir: $HOME
+#        creates: pod_network_setup.txt
 
     - name: install kube-flannel-rbac
       become: yes
