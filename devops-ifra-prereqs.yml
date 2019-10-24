@@ -246,7 +246,7 @@
   become: yes
   tasks:
     - name: initialize the cluster using script
-      script: /infra/kube.sh
+      script: /infra/workspace/VM_Deployment/kube.sh
       #- name: initialize the cluster
       #shell: kubeadm init --pod-network-cidr=10.244.0.0/16 >> cluster_initialized.txt #--skip-preflight-checks=true --apiserver-advertise-address=10.80.151.199 --pod-network-cidr=10.244.0.0/16 >> cluster_initialized.txt
 #      args:
